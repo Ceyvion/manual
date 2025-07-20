@@ -1,0 +1,319 @@
+/* Speed-Index 2.0 - Authentic Mid-Century Edition */
+
+:root {
+    --paper: #F5F3EB;
+    --ink: #000000;
+    --ink-faded: rgba(0, 0, 0, 0.75);
+    --baseline: 8px;
+    --card-height-desktop: 72px;
+    --card-height-mobile: 56px;
+    --tab-height: 20px;
+    --tab-offset-desktop: 32px;
+    --tab-offset-mobile: 24px;
+    --page-gutter: 16px;
+}
+
+/* Dark mode variables for Severance mode */
+:root.severance {
+    --paper: #0d0d0d;
+    --ink: #f8f8f8;
+    --ink-faded: rgba(248, 248, 248, 0.75);
+}
+
+/* Base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', monospace;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0.015em;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Paper grain overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 1px 1px, rgba(0,0,0,.15) 1px, transparent 0);
+    background-size: 20px 20px;
+    opacity: 0.12;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.severance body::before {
+    filter: hue-rotate(2deg);
+}
+
+/* Drawer container */
+.drawer {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    padding: var(--page-gutter);
+}
+
+/* Search bar */
+.search-bar {
+    position: relative;
+    margin-bottom: calc(var(--baseline) * 3);
+    max-width: 400px;
+}
+
+#search-input {
+    width: 100%;
+    height: 48px;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: clamp(0.8rem, 0.6vw + 0.5rem, 1rem);
+    letter-spacing: 0.015em;
+    text-transform: uppercase;
+    color: var(--ink);
+    padding: 0 48px 0 16px;
+    outline: none;
+}
+
+#search-input::placeholder {
+    color: var(--ink-faded);
+}
+
+#search-input:focus {
+    box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+.search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--ink);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px;
+}
+
+/* Card stack */
+.stack {
+    position: relative;
+    contain: layout style paint;
+}
+
+/* Card base */
+.card {
+    position: relative;
+    width: 100%;
+    height: var(--card-height-desktop);
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    margin-bottom: -1px;
+    overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0.33, 0.02, 0.18, 0.97);
+}
+
+.card.expanded {
+    max-height: 450px;
+    height: auto;
+    z-index: 10;
+    margin-bottom: 16px;
+}
+
+/* Tab button */
+.tab-button {
+    position: absolute;
+    top: -1px;
+    height: var(--tab-height);
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: clamp(0.8rem, 0.6vw + 0.5rem, 1rem);
+    letter-spacing: 0.015em;
+    text-transform: uppercase;
+    padding: 0 12px;
+    cursor: ns-resize;
+    display: flex;
+    align-items: center;
+    z-index: 5;
+    transition: none;
+}
+
+.tab-button::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--ink);
+    transform: scaleX(0);
+    transition: transform 120ms ease-out;
+}
+
+.tab-button:hover::after,
+.tab-button:focus::after {
+    transform: scaleX(1);
+}
+
+.tab-button:focus {
+    outline: none;
+}
+
+/* Tab positioning - staircase effect */
+.card:nth-child(14n+1) .tab-button { left: calc(0 * var(--tab-offset-desktop)); }
+.card:nth-child(14n+2) .tab-button { left: calc(1 * var(--tab-offset-desktop)); }
+.card:nth-child(14n+3) .tab-button { left: calc(2 * var(--tab-offset-desktop)); }
+.card:nth-child(14n+4) .tab-button { left: calc(3 * var(--tab-offset-desktop)); }
+.card:nth-child(14n+5) .tab-button { left: calc(4 * var(--tab-offset-desktop)); }
+.card:nth-child(14n+6) .tab-button { left: calc(5 * var(--tab-offset-desktop)); }
+.card:nth-child(14n+7) .tab-button { left: calc(6 * var(--tab-offset-desktop)); }
+.card:nth-child(14n+8) .tab-button { left: calc(7 * var(--tab-offset-desktop)); }
+.card:nth-child(14n+9) .tab-button { left: calc(8 * var(--tab-offset-desktop)); }
+.card:nth-child(14n+10) .tab-button { left: calc(9 * var(--tab-offset-desktop)); }
+.card:nth-child(14n+11) .tab-button { left: calc(10 * var(--tab-offset-desktop)); }
+.card:nth-child(14n+12) .tab-button { left: calc(11 * var(--tab-offset-desktop)); }
+.card:nth-child(14n+13) .tab-button { left: calc(12 * var(--tab-offset-desktop)); }
+.card:nth-child(14n+0) .tab-button { left: calc(13 * var(--tab-offset-desktop)); }
+
+/* Card body */
+.card-body {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    padding: calc(var(--tab-height) + 12px) 16px 16px;
+    opacity: 0;
+    transition: opacity 200ms ease-out 80ms;
+}
+
+.card.expanded .card-body {
+    display: flex;
+    opacity: 1;
+}
+
+.card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: calc(var(--baseline) / 2) 0;
+    border-bottom: 1px solid var(--ink-faded);
+}
+
+.card-row:last-child {
+    border-bottom: none;
+}
+
+.card-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.015em;
+    color: var(--ink);
+}
+
+.card-value {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 400;
+    font-size: 0.9rem;
+    color: var(--ink-faded);
+    text-align: right;
+    max-width: 60%;
+}
+
+/* Search filtering */
+.card.filtered {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+    .drawer {
+        padding: var(--page-gutter);
+    }
+    
+    .card {
+        height: var(--card-height-mobile);
+    }
+    
+    .search-bar {
+        position: sticky;
+        top: 0;
+        background: var(--paper);
+        z-index: 20;
+        margin-bottom: calc(var(--baseline) * 2);
+    }
+    
+    /* Mobile tab positioning */
+    .card:nth-child(14n+1) .tab-button { left: calc(0 * var(--tab-offset-mobile)); }
+    .card:nth-child(14n+2) .tab-button { left: calc(1 * var(--tab-offset-mobile)); }
+    .card:nth-child(14n+3) .tab-button { left: calc(2 * var(--tab-offset-mobile)); }
+    .card:nth-child(14n+4) .tab-button { left: calc(3 * var(--tab-offset-mobile)); }
+    .card:nth-child(14n+5) .tab-button { left: calc(4 * var(--tab-offset-mobile)); }
+    .card:nth-child(14n+6) .tab-button { left: calc(5 * var(--tab-offset-mobile)); }
+    .card:nth-child(14n+7) .tab-button { left: calc(6 * var(--tab-offset-mobile)); }
+    .card:nth-child(14n+8) .tab-button { left: calc(7 * var(--tab-offset-mobile)); }
+    .card:nth-child(14n+9) .tab-button { left: calc(8 * var(--tab-offset-mobile)); }
+    .card:nth-child(14n+10) .tab-button { left: calc(9 * var(--tab-offset-mobile)); }
+    .card:nth-child(14n+11) .tab-button { left: calc(10 * var(--tab-offset-mobile)); }
+    .card:nth-child(14n+12) .tab-button { left: calc(11 * var(--tab-offset-mobile)); }
+    .card:nth-child(14n+13) .tab-button { left: calc(12 * var(--tab-offset-mobile)); }
+    .card:nth-child(14n+0) .tab-button { left: calc(13 * var(--tab-offset-mobile)); }
+}
+
+@media (max-width: 380px) {
+    .tab-button {
+        position: absolute;
+        left: 0 !important;
+    }
+    
+    .card-body {
+        font-size: 0.7rem;
+    }
+    
+    .card-value {
+        font-size: 0.7rem;
+    }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+    .drawer {
+        padding-top: calc(var(--page-gutter) * 0.8);
+        padding-bottom: calc(var(--page-gutter) * 0.8);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .card,
+    .card-body,
+    .tab-button::after {
+        transition: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    :root {
+        --ink-faded: rgba(0, 0, 0, 0.9);
+    }
+}
