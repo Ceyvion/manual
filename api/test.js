@@ -8,8 +8,9 @@ module.exports = (req, res) => {
     }
     
     return res.status(200).json({
-        status: 'OK',
-        message: 'Afropop Operations Manual API is running',
-        timestamp: new Date().toISOString()
+        message: 'Vercel API is working with CommonJS!',
+        timestamp: new Date().toISOString(),
+        method: req.method,
+        url: req.url
     });
 };
