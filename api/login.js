@@ -1,12 +1,4 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'afropop-operations-manual-secret-key-2024-secure';
-
-// Pre-hashed password for 'afropop123'
-const ADMIN_PASSWORD_HASH = '$2b$12$LQv3c1yqBWVHxkd0LQ4YCOWXuIq6uqoS1H.LJ5J5J5J5J5J5J5J2.6';
-
-export default async function handler(req, res) {
+export default function handler(req, res) {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -29,10 +21,10 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Password required' });
         }
 
-        // Simple password check for now - you can enhance this later
+        // Simple password check
         if (password === 'afropop123') {
-            const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '24h' });
-            return res.json({ token, message: 'Login successful' });
+            const token = 'simple-demo-token-' + Date.now();
+            return res.status(200).json({ token, message: 'Login successful' });
         } else {
             return res.status(401).json({ error: 'Invalid password' });
         }
