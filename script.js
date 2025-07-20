@@ -7,7 +7,9 @@ class OperationsManual {
         this.expandedCard = null;
         this.konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
         this.konamiInput = [];
-        this.API_BASE = window.location.origin;
+        this.API_BASE = window.location.hostname === 'localhost' ? 
+            'http://localhost:3001' : 
+            window.location.origin;
         
         this.categories = [
             '01_Archive_Audio',

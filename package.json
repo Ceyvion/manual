@@ -7,7 +7,9 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "init-db": "node scripts/init-database.js",
-    "cli": "node cli/file-manager.js"
+    "setup": "node scripts/setup-test-db.js",
+    "cli": "node cli/file-manager.js",
+    "vercel-build": "echo 'Build complete'"
   },
   "keywords": ["afropop", "file-storage", "operations-manual"],
   "author": "Afropop Team",
