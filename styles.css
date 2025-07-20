@@ -317,3 +317,504 @@ body::before {
         --ink-faded: rgba(0, 0, 0, 0.9);
     }
 }
+
+/* Authentication and Security Styles */
+
+/* Login Screen */
+.login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--paper);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--page-gutter);
+}
+
+.login-container {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    padding: 48px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+.login-header h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    color: var(--ink);
+}
+
+.login-header h2 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 400;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--ink-faded);
+    margin-bottom: 32px;
+}
+
+.login-form {
+    margin-bottom: 32px;
+}
+
+.input-group {
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.015em;
+    color: var(--ink);
+    margin-bottom: 8px;
+}
+
+.input-group input,
+.input-group textarea,
+.input-group select {
+    width: 100%;
+    padding: 12px;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+    outline: none;
+}
+
+.input-group input:focus,
+.input-group textarea:focus,
+.input-group select:focus {
+    box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+.login-button,
+.action-btn,
+.header-btn,
+.file-btn {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 12px 24px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.015em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.login-button:hover,
+.action-btn:hover,
+.header-btn:hover {
+    background: var(--ink-faded);
+}
+
+.login-button {
+    width: 100%;
+}
+
+.error-message {
+    background: #ff6b6b;
+    color: white;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    margin-top: 16px;
+}
+
+.login-footer {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.7rem;
+    color: var(--ink-faded);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+}
+
+/* Main Application */
+.main-app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 16px var(--page-gutter);
+    border-bottom: 1px solid var(--ink);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header-content h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.header-btn {
+    padding: 8px 16px;
+    font-size: 0.7rem;
+    background: transparent;
+    color: var(--paper);
+    border: 1px solid var(--paper);
+}
+
+.header-btn:hover {
+    background: var(--paper);
+    color: var(--ink);
+}
+
+.header-btn.logout {
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+}
+
+.header-btn.logout:hover {
+    background: #ff6b6b;
+    color: white;
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--page-gutter);
+}
+
+.modal-content {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--paper);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    opacity: 0.7;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+/* File Manager Styles */
+.file-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 8px 16px;
+    font-size: 0.7rem;
+}
+
+.file-categories {
+    margin-bottom: 24px;
+}
+
+.file-categories label {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.015em;
+    color: var(--ink);
+    margin-bottom: 8px;
+}
+
+.file-list {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--ink);
+    padding: 16px;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--ink-faded);
+}
+
+.file-item:last-child {
+    border-bottom: none;
+}
+
+.file-info {
+    flex: 1;
+}
+
+.file-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin-bottom: 4px;
+}
+
+.file-meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.file-meta span {
+    font-size: 0.7rem;
+    color: var(--ink-faded);
+    text-transform: uppercase;
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.file-category {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2px 6px;
+}
+
+.file-description {
+    font-size: 0.8rem;
+    color: var(--ink-faded);
+    font-style: italic;
+}
+
+.file-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.file-btn {
+    padding: 6px 12px;
+    font-size: 0.6rem;
+}
+
+.file-btn.delete {
+    background: #ff6b6b;
+}
+
+.file-btn.delete:hover {
+    background: #e55555;
+}
+
+.file-btn.download {
+    background: #4ecdc4;
+    color: var(--ink);
+}
+
+.file-btn.download:hover {
+    background: #45b7b8;
+}
+
+.no-files {
+    text-align: center;
+    color: var(--ink-faded);
+    font-style: italic;
+    padding: 48px;
+}
+
+/* Upload Form Styles */
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.file-info {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    padding: 12px;
+    font-size: 0.8rem;
+    color: var(--ink-faded);
+    margin-top: 8px;
+}
+
+/* Notification Styles */
+.notification {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px 24px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.015em;
+    z-index: 3000;
+    animation: slideIn 0.3s ease;
+}
+
+.notification.success {
+    background: #4ecdc4;
+    color: var(--ink);
+}
+
+.notification.error {
+    background: #ff6b6b;
+    color: white;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Adjustments for New Elements */
+@media (max-width: 640px) {
+    .login-container {
+        padding: 32px 24px;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    .header-content h1 {
+        font-size: 1rem;
+    }
+    
+    .modal-content {
+        margin: 0;
+        max-height: 100vh;
+        width: 100%;
+        border: none;
+    }
+    
+    .modal-body {
+        padding: 16px;
+    }
+    
+    .file-actions {
+        flex-direction: column;
+    }
+    
+    .action-btn {
+        width: 100%;
+    }
+    
+    .file-item {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .file-actions {
+        align-self: stretch;
+    }
+    
+    .file-btn {
+        flex: 1;
+    }
+    
+    .notification {
+        top: 16px;
+        right: 16px;
+        left: 16px;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .login-container {
+        padding: 24px 16px;
+    }
+    
+    .login-header h1 {
+        font-size: 1.2rem;
+    }
+    
+    .header-btn {
+        padding: 6px 12px;
+        font-size: 0.6rem;
+    }
+}

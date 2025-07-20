@@ -1,18 +1,464 @@
-// Operations Manual - Interactive Functionality
+// Afropop Operations Manual - Enhanced with File Storage
 class OperationsManual {
     constructor() {
         this.cards = [];
+        this.files = [];
+        this.token = localStorage.getItem('afropop_token');
         this.expandedCard = null;
         this.konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
         this.konamiInput = [];
+        this.API_BASE = window.location.origin;
+        
+        this.categories = [
+            '01_Archive_Audio',
+            '02_Images', 
+            '03_Scripts_&_Text',
+            '04_Grants_Compliance',
+            '05_Fundraising',
+            '06_Finance',
+            '07_Analytics',
+            '08_Templates',
+            '09_Social_Media',
+            '10_Website_Backup',
+            '99_Obsolete'
+        ];
         
         this.init();
     }
 
     init() {
+        this.checkAuthentication();
         this.createSampleData();
         this.renderCards();
         this.setupEventListeners();
+        this.populateCategorySelects();
+    }
+
+    checkAuthentication() {
+        if (this.token) {
+            // Verify token is still valid
+            this.verifyToken().then(valid => {
+                if (valid) {
+                    this.showMainApp();
+                } else {
+                    this.showLoginScreen();
+                }
+            });
+        } else {
+            this.showLoginScreen();
+        }
+    }
+
+    async verifyToken() {
+        try {
+            const response = await fetch(`${this.API_BASE}/api/health`, {
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+            return response.ok;
+        } catch {
+            return false;
+        }
+    }
+
+    showLoginScreen() {
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('main-app').style.display = 'none';
+        document.getElementById('password').focus();
+    }
+
+    showMainApp() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        this.loadFiles();
+    }
+
+    async login(password) {
+        try {
+            const response = await fetch(`${this.API_BASE}/api/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                this.token = data.token;
+                localStorage.setItem('afropop_token', this.token);
+                this.showMainApp();
+                return { success: true };
+            } else {
+                return { success: false, error: data.error };
+            }
+        } catch (error) {
+            return { success: false, error: 'Connection error' };
+        }
+    }
+
+    logout() {
+        this.token = null;
+        localStorage.removeItem('afropop_token');
+        this.showLoginScreen();
+    }
+
+    async loadFiles(category = null) {
+        if (!this.token) return;
+
+        try {
+            const url = category 
+                ? `${this.API_BASE}/api/files?category=${encodeURIComponent(category)}`
+                : `${this.API_BASE}/api/files`;
+
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            if (response.ok) {
+                this.files = await response.json();
+                this.renderFileList();
+            }
+        } catch (error) {
+            console.error('Error loading files:', error);
+        }
+    }
+
+    renderFileList() {
+        const fileList = document.getElementById('file-list');
+        if (!fileList) return;
+
+        if (this.files.length === 0) {
+            fileList.innerHTML = '<p class="no-files">No files found</p>';
+            return;
+        }
+
+        fileList.innerHTML = this.files.map(file => `
+            <div class="file-item">
+                <div class="file-info">
+                    <div class="file-name">${file.original_name}</div>
+                    <div class="file-meta">
+                        <span class="file-category">${file.category}</span>
+                        <span class="file-type">${file.storage_type === 'direct' ? '📦 Stored' : '🔗 Link'}</span>
+                        <span class="file-size">${file.file_size > 0 ? `${(file.file_size / 1024).toFixed(1)}KB` : 'Link'}</span>
+                        <span class="file-date">${new Date(file.created_at).toLocaleDateString()}</span>
+                    </div>
+                    ${file.description ? `<div class="file-description">${file.description}</div>` : ''}
+                </div>
+                <div class="file-actions">
+                    <button onclick="operationsManual.downloadFile(${file.id})" class="file-btn download">OPEN</button>
+                    <button onclick="operationsManual.deleteFile(${file.id})" class="file-btn delete">DELETE</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async downloadFile(id) {
+        if (!this.token) return;
+
+        try {
+            const response = await fetch(`${this.API_BASE}/api/files/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            if (response.ok) {
+                // Check if it's a redirect (for links)
+                if (response.redirected) {
+                    window.open(response.url, '_blank');
+                } else {
+                    // Download the file
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'download';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                }
+            }
+        } catch (error) {
+            console.error('Error downloading file:', error);
+        }
+    }
+
+    async deleteFile(id) {
+        if (!this.token) return;
+        
+        if (!confirm('Are you sure you want to delete this file?')) return;
+
+        try {
+            const response = await fetch(`${this.API_BASE}/api/files/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            if (response.ok) {
+                this.loadFiles();
+                this.showNotification('File deleted successfully', 'success');
+            } else {
+                const error = await response.json();
+                this.showNotification(error.error || 'Failed to delete file', 'error');
+            }
+        } catch (error) {
+            this.showNotification('Error deleting file', 'error');
+        }
+    }
+
+    async uploadFile(formData) {
+        if (!this.token) return;
+
+        try {
+            const response = await fetch(`${this.API_BASE}/api/files`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                this.loadFiles();
+                this.showNotification('File uploaded successfully', 'success');
+                return { success: true };
+            } else {
+                this.showNotification(data.error || 'Upload failed', 'error');
+                return { success: false, error: data.error };
+            }
+        } catch (error) {
+            this.showNotification('Upload error', 'error');
+            return { success: false, error: 'Connection error' };
+        }
+    }
+
+    populateCategorySelects() {
+        const selects = ['file-category', 'link-category', 'category-filter'];
+        
+        selects.forEach(selectId => {
+            const select = document.getElementById(selectId);
+            if (select) {
+                // Keep existing options for filter
+                if (selectId === 'category-filter') {
+                    select.innerHTML = '<option value="">ALL CATEGORIES</option>';
+                } else {
+                    select.innerHTML = '<option value="">SELECT CATEGORY</option>';
+                }
+                
+                this.categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category.replace(/^\d+_/, '').replace(/_/g, ' ');
+                    select.appendChild(option);
+                });
+            }
+        });
+    }
+
+    showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        
+        // Add to page
+        document.body.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    setupEventListeners() {
+        // Login form
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const password = document.getElementById('password').value;
+                const loginText = document.getElementById('login-text');
+                const loginLoading = document.getElementById('login-loading');
+                const loginError = document.getElementById('login-error');
+
+                loginText.style.display = 'none';
+                loginLoading.style.display = 'inline';
+                loginError.style.display = 'none';
+
+                const result = await this.login(password);
+
+                loginText.style.display = 'inline';
+                loginLoading.style.display = 'none';
+
+                if (!result.success) {
+                    loginError.textContent = result.error;
+                    loginError.style.display = 'block';
+                    document.getElementById('password').value = '';
+                }
+            });
+        }
+
+        // Logout button
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                this.logout();
+            });
+        }
+
+        // File manager button
+        const fileManagerBtn = document.getElementById('file-manager-btn');
+        if (fileManagerBtn) {
+            fileManagerBtn.addEventListener('click', () => {
+                document.getElementById('file-manager-modal').style.display = 'flex';
+                this.loadFiles();
+            });
+        }
+
+        // Modal close buttons
+        const closeButtons = document.querySelectorAll('.close-btn');
+        closeButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const modal = e.target.closest('.modal');
+                if (modal) modal.style.display = 'none';
+            });
+        });
+
+        // File upload modal
+        const uploadBtn = document.getElementById('upload-file-btn');
+        if (uploadBtn) {
+            uploadBtn.addEventListener('click', () => {
+                document.getElementById('upload-modal').style.display = 'flex';
+            });
+        }
+
+        // Link add modal
+        const linkBtn = document.getElementById('add-link-btn');
+        if (linkBtn) {
+            linkBtn.addEventListener('click', () => {
+                document.getElementById('link-modal').style.display = 'flex';
+            });
+        }
+
+        // Refresh files
+        const refreshBtn = document.getElementById('refresh-files-btn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                this.loadFiles();
+            });
+        }
+
+        // Category filter
+        const categoryFilter = document.getElementById('category-filter');
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', (e) => {
+                this.loadFiles(e.target.value || null);
+            });
+        }
+
+        // File upload form
+        const uploadForm = document.getElementById('upload-form');
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData();
+                const fileInput = document.getElementById('file-input');
+                const categoryInput = document.getElementById('file-category');
+                const descriptionInput = document.getElementById('file-description');
+
+                if (!fileInput.files[0]) {
+                    this.showNotification('Please select a file', 'error');
+                    return;
+                }
+
+                formData.append('file', fileInput.files[0]);
+                formData.append('category', categoryInput.value);
+                formData.append('description', descriptionInput.value);
+
+                const result = await this.uploadFile(formData);
+                
+                if (result.success) {
+                    document.getElementById('upload-modal').style.display = 'none';
+                    uploadForm.reset();
+                    document.getElementById('file-info').style.display = 'none';
+                }
+            });
+        }
+
+        // Link form
+        const linkForm = document.getElementById('link-form');
+        if (linkForm) {
+            linkForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData();
+                const urlInput = document.getElementById('link-url');
+                const categoryInput = document.getElementById('link-category');
+                const descriptionInput = document.getElementById('link-description');
+
+                formData.append('file_url', urlInput.value);
+                formData.append('category', categoryInput.value);
+                formData.append('description', descriptionInput.value);
+
+                const result = await this.uploadFile(formData);
+                
+                if (result.success) {
+                    document.getElementById('link-modal').style.display = 'none';
+                    linkForm.reset();
+                }
+            });
+        }
+
+        // File input change handler
+        const fileInput = document.getElementById('file-input');
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                const fileInfo = document.getElementById('file-info');
+                
+                if (file) {
+                    const size = (file.size / 1024 / 1024).toFixed(2);
+                    const maxSize = 5; // MB
+                    
+                    let info = `File: ${file.name}<br>Size: ${size}MB`;
+                    
+                    if (size > maxSize) {
+                        info += `<br><span style="color: #ff6b6b;">⚠️ File exceeds ${maxSize}MB limit. Consider adding as external link instead.</span>`;
+                    }
+                    
+                    fileInfo.innerHTML = info;
+                    fileInfo.style.display = 'block';
+                } else {
+                    fileInfo.style.display = 'none';
+                }
+            });
+        }
+
+        // Original search functionality
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+        }
+
+        // Close modals on outside click
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+
+        // Konami code listener
+        document.addEventListener('keydown', (e) => this.handleKonamiCode(e.code));
     }
 
     createSampleData() {
@@ -144,6 +590,8 @@ class OperationsManual {
 
     renderCards() {
         const stack = document.getElementById('card-stack');
+        if (!stack) return;
+        
         stack.innerHTML = '';
 
         this.cards.forEach((card, index) => {
@@ -223,14 +671,6 @@ class OperationsManual {
         }
     }
 
-    setupEventListeners() {
-        const searchInput = document.getElementById('search-input');
-        searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
-
-        // Konami code listener
-        document.addEventListener('keydown', (e) => this.handleKonamiCode(e.code));
-    }
-
     handleSearch(query) {
         const normalizedQuery = query.toLowerCase().trim();
         const cards = document.querySelectorAll('.card');
@@ -302,8 +742,9 @@ class OperationsManual {
 }
 
 // Initialize the manual when DOM is ready
+let operationsManual;
 document.addEventListener('DOMContentLoaded', () => {
-    new OperationsManual();
+    operationsManual = new OperationsManual();
 });
 
 // Performance optimization for reduced motion
