@@ -1,35 +1,39 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "server.js",
-      "use": "@vercel/node"
+  "functions": {
+    "api/health.js": {
+      "runtime": "nodejs18.x"
     },
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
+    "api/login.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/files/index.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/files/[id].js": {
+      "runtime": "nodejs18.x"
     }
-  ],
+  },
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/server.js"
+      "src": "/api/health",
+      "dest": "/api/health.js"
     },
     {
-      "src": "/(.*\\.(css|js|html|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
-      "dest": "/public/$1"
+      "src": "/api/login",
+      "dest": "/api/login.js"
+    },
+    {
+      "src": "/api/files",
+      "dest": "/api/files/index.js"
+    },
+    {
+      "src": "/api/files/(.*)",
+      "dest": "/api/files/[id].js"
     },
     {
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "functions": {
-    "server.js": {
-      "maxDuration": 30
-    }
-  },
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
